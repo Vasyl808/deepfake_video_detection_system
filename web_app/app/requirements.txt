@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+torch
+torchvision
+opencv-python
+numpy
+matplotlib
+starlette
+facenet_pytorch

@@ -16,3 +16,5 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+
+web_app/app/best_ResNetLSTMNoBiClassifier20x224_lstm_checkpoint_epoch_step_23.pt
