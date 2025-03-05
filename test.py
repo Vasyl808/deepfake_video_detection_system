@@ -93,15 +93,15 @@ def main() -> None:
     args = parser.parse_args()
     _, _, test_path = get_data_path(args.train_path)
 
-    if args.model.lower() == "ResNet3D":
+    if args.model.lower() == "resnet3d":
         parms = get_model_parms('hyperparameters_resnet3d')
         hparms: Dict[str, Any] = get_train_hparms('hyperparameters_resnet3d')
         model: nn.Module = ResNet3DClassifier(**parms)
-    elif args.model.lower() == "EffB3LSTM":
+    elif args.model.lower() == "effb3lstm":
         parms = get_model_parms('hyperparameters_eff_b3_lstm')
         hparms: Dict[str, Any] = get_train_hparms('hyperparameters_eff_b3_lstm')
         model: nn.Module = B3LSTMClassifier(**parms)
-    elif args.model.lower() == "ResNetLSTM":
+    elif args.model.lower() == "resnetlstm":
         parms = get_model_parms('hyperparameters_resnet_lstm')
         hparms: Dict[str, Any] = get_train_hparms('hyperparameters_resnet_lstm')
         model: nn.Module = ResNetLSTMClassifier(**parms)
@@ -110,7 +110,7 @@ def main() -> None:
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     checkpoint = torch.load(args.model_path, map_location=device)
-    model.load_state_dict(checkpoint)
+    model.load_state_dict(checkpoint['model_state_dict'])
     
     test_model(model, test_path, hparms['n_frames'], hparms['size'])
 
