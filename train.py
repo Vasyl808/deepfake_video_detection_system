@@ -44,6 +44,12 @@ def main() -> None:
         default="cuda",
         help="Device to run training on (default: cuda)"
     )
+    parser.add_argument(
+        "--optimaizer",
+        type=str,
+        default="adam",
+        help="Optimaizer type SGD or Adam (default: adam)"
+    )
     args = parser.parse_args()
     train_path, val_path, test_path = get_data_path(args.train_path)
 
@@ -79,10 +85,12 @@ def main() -> None:
         'gamma': hparms['gamma']
     }
 
-    if args.optimaizer.lower() == 'SGD':
+    if args.optimaizer.lower() == 'sgd':
         optimaizer = optim.SGD(momentum=0.9)
-    else:
+    elif args.optimaizer.lower() == 'adam':
         optimaizer = optim.Adam()
+    else:
+        raise ValueError(f"Unknown optimaizer: {args.optimaizer}")
 
     train_transform = transforms.Compose([
         transforms.RandomHorizontalFlip(p=0.5),
