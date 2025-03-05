@@ -25,7 +25,7 @@ class Trainer:
         size: Tuple[int, int],
         device: torch.device,
         name: str,
-        optimaizer: nn.Module,
+        optimaizer: str,
         checkpoint_path: Optional[str] = None,
         early_stopping_params: Optional[Dict[str, Any]] = None,
         criterion: Optional[nn.Module] = None,
@@ -82,10 +82,18 @@ class Trainer:
         self.early_stopping = EarlyStopping(**early_stopping_params)
 
         self.criterion: nn.Module = criterion if criterion is not None else nn.BCEWithLogitsLoss()
-  
-        if optimizer_params is None:
-            optimizer_params = {'lr': self.lr, 'weight_decay': 5e-4}
-        self.optimizer = optimaizer(self.model.parameters(), **optimizer_params)
+        
+        if optimaizer == 'sgd':
+            if optimizer_params is None:
+                optimizer_params = {'lr': self.lr, 'weight_decay': 5e-4}
+            self.optimizer = optim.SGD(
+                self.model.parameters(), momentum=0.9, 
+                lr=optimizer_params['lr'], weight_decay=optimizer_params['weight_decay']
+            )
+        else:
+            if optimizer_params is None:
+                optimizer_params = {'lr': self.lr, 'weight_decay': 5e-4}
+            self.optimizer = optim.Adam(self.model.parameters(), **optimizer_params)
         
         if scheduler_params is None:
             scheduler_params = {'milestones': self.milestones, 'gamma': self.gamma}

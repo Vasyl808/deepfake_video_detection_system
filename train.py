@@ -85,11 +85,7 @@ def main() -> None:
         'gamma': hparms['gamma']
     }
 
-    if args.optimaizer.lower() == 'sgd':
-        optimaizer = optim.SGD(momentum=0.9)
-    elif args.optimaizer.lower() == 'adam':
-        optimaizer = optim.Adam()
-    else:
+    if args.optimaizer.lower() not in ['sgd', 'adam']:
         raise ValueError(f"Unknown optimaizer: {args.optimaizer}")
 
     train_transform = transforms.Compose([
@@ -109,7 +105,7 @@ def main() -> None:
 
     trainer: Trainer = Trainer(
         model, hparms, train_path, val_path, hparms['size'], torch.device(args.device),
-        args.model, optimaizer, val_transform=val_transform, train_transform=train_transform,
+        args.model, args.optimaizer.lower(), val_transform=val_transform, train_transform=train_transform,
         early_stopping_params=early_stopping_params, optimizer_params=optimizer_params, 
         scheduler_params=scheduler_params
     )
