@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch
 from torchvision import models
-from base_model import BaseModel
+from models.base_model import BaseModel
 
 
 class B3LSTMClassifier(BaseModel):

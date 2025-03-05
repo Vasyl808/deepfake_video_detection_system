@@ -1,7 +1,7 @@
 import torch.nn as nn
 from torchvision import models
 import torch
-from base_model import BaseModel
+from models.base_model import BaseModel
 
 
 class ResNet3DClassifier(BaseModel):
