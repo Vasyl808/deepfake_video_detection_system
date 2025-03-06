@@ -135,7 +135,7 @@ class Trainer:
             self.val_dataset, batch_size=self.batch_size, shuffle=False
         )
 
-    def load_checkpoint(self) -> int:
+    def _load_checkpoint(self) -> int:
         if self.checkpoint_path:
             print(f"Loading checkpoint from {self.checkpoint_path}")
             checkpoint: Dict[str, Any] = torch.load(self.checkpoint_path)
@@ -147,7 +147,7 @@ class Trainer:
             return start_epoch
         return 0
 
-    def train_one_epoch(self, epoch: int) -> Tuple[float, float, List[Any], List[Any]]:
+    def _train_one_epoch(self, epoch: int) -> Tuple[float, float, List[Any], List[Any]]:
         epoch_loss: float = 0.0
         wrong_preds: int = 0
         total_samples: int = 0
@@ -181,7 +181,7 @@ class Trainer:
         accuracy: float = (total_samples - wrong_preds) / total_samples
         return avg_loss, accuracy, all_labels, all_preds
 
-    def evaluate(self) -> Tuple[float, float, float, List[Any], List[Any]]:
+    def _evaluate(self) -> Tuple[float, float, float, List[Any], List[Any]]:
         self.model.eval()
         epoch_loss: float = 0.0
         all_labels: List[Any] = []
@@ -208,7 +208,7 @@ class Trainer:
         auc: float = roc_auc_score(all_labels, all_probs)
         return avg_loss, accuracy, auc, all_labels, all_preds
 
-    def save_checkpoint(self, epoch: int) -> None:
+    def _save_checkpoint(self, epoch: int) -> None:
         checkpoint_file: str = f'best_{self.name}_lstm_checkpoint_epoch_{epoch + 1}.pt'
         torch.save({
             'model_state_dict': self.model.state_dict(),
@@ -230,20 +230,20 @@ class Trainer:
         overall_train_labels: List[Any] = []
         overall_train_preds: List[Any] = []
         
-        start_epoch: int = self.load_checkpoint()
+        start_epoch: int = self._load_checkpoint()
         
         for epoch in range(start_epoch, self.num_epochs):
             epoch_start: float = time.time()
             
             # Training phase
-            train_loss, train_acc, epoch_train_labels, epoch_train_preds = self.train_one_epoch(epoch)
+            train_loss, train_acc, epoch_train_labels, epoch_train_preds = self._train_one_epoch(epoch)
             train_losses.append(train_loss)
             train_accuracies.append(train_acc)
             overall_train_labels.extend(epoch_train_labels)
             overall_train_preds.extend(epoch_train_preds)
             
             # Evaluation phase
-            val_loss, val_acc, val_auc, val_labels, val_preds = self.evaluate()
+            val_loss, val_acc, val_auc, val_labels, val_preds = self._evaluate()
             val_losses.append(val_loss)
             val_accuracies.append(val_acc)
             
@@ -257,7 +257,7 @@ class Trainer:
             
             self.scheduler.step()
 
-            self.save_checkpoint(epoch)
+            self._save_checkpoint(epoch)
             
             self.early_stopping(val_loss, self.model)
             if self.early_stopping.early_stop:
