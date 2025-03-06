@@ -103,39 +103,53 @@ def process_frame(frame):
 
 def extract_frames(video_path, num_frames=20):
     cap = cv2.VideoCapture(video_path)
-    face_sequences = {}
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if not cap.isOpened():
+        return []
 
-    for i in range(num_frames):
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    video_duration_sec = total_frames / fps
+
+    max_duration_sec = 10.0
+    if video_duration_sec > max_duration_sec:
+        frames_to_consider = int(fps * max_duration_sec)
+    else:
+        frames_to_consider = total_frames
+
+    frame_indices = np.linspace(0, frames_to_consider - 1, num_frames, dtype=int)
+
+    face_sequences = {}
+
+    for frame_index in frame_indices:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
         ret, frame = cap.read()
         if not ret:
-            break
+            continue
 
         processed_faces = process_frame(frame)
         if processed_faces is not None:
             for face, box in processed_faces:
                 is_unique = True
-                '''for key, (prev_box, _) in face_sequences.items():
-                    if abs(box[0] - prev_box[0]) < 50 and abs(box[1] - prev_box[1]) < 50 and \
-                       abs(box[2] - prev_box[2]) < 50 and abs(box[3] - prev_box[3]) < 50:
-                        is_unique = False
-                        face_sequences[key][1].append(face)
-                        break'''
                 current_center = np.array([(box[0] + box[2]) / 2, (box[1] + box[3]) / 2])
-                for key, (prev_box, _) in face_sequences.items():
+                for key, (prev_box, faces) in face_sequences.items():
                     prev_center = np.array([(prev_box[0] + prev_box[2]) / 2, (prev_box[1] + prev_box[3]) / 2])
                     distance = np.linalg.norm(current_center - prev_center)
-
                     if distance <= 50:
                         is_unique = False
-                        face_sequences[key][1].append(face)
+                        faces.append(face)
                         break
                 if is_unique:
                     face_sequences[len(face_sequences)] = (box, [face])
 
     cap.release()
 
-    min_length = min(len(seq) for _, seq in face_sequences.values())
-    face_sequences = {key: seq for key, (_, seq) in face_sequences.items()}
+    face_sequences = {key: faces for key, (_, faces) in face_sequences.items()}
+
+    for key, seq in face_sequences.items():
+        if len(seq) < num_frames:
+            last_frame = seq[-1]
+            seq.extend([last_frame] * (num_frames - len(seq)))
 
     return list(face_sequences.values())
+    
