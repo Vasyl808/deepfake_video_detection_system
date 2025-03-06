@@ -68,7 +68,6 @@ def main() -> None:
     else:
         raise ValueError(f"Unknown model: {args.model}")
 
-
     early_stopping_params: Dict[str, Any] = {
         'patience': 15,
         'verbose': True,
@@ -88,6 +87,13 @@ def main() -> None:
     if args.optimaizer.lower() not in ['sgd', 'adam']:
         raise ValueError(f"Unknown optimaizer: {args.optimaizer}")
 
+    if args.model.lower() == "resnet3d":
+        mean = [0.45, 0.45, 0.45]
+        std = [0.225, 0.225, 0.225]
+    else:
+        mean = [0.485, 0.456, 0.406]
+        std = [0.229, 0.224, 0.225]
+
     train_transform = transforms.Compose([
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
@@ -95,12 +101,11 @@ def main() -> None:
         transforms.ColorJitter(brightness=0.2, contrast=0.2,
                                        saturation=0.1, hue=0.05),
         transforms.RandomGrayscale(p=0.1),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
+        transforms.Normalize(mean=mean, std=std),
     ])
 
     val_transform = transforms.Compose([
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        transforms.Normalize(mean=mean, std=std),
     ])
 
     trainer: Trainer = Trainer(

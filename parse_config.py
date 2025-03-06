@@ -1,5 +1,7 @@
-def get_model_parms(name: str):
-    
+from typing import Dict, Union, Any
+
+
+def get_model_parms(name: str) -> Dict[str, Union[int, float, bool]]:
     hyperparameters = {
         "hyperparameters_resnet_lstm": {
             'lstm_hidden_dim': 32,
@@ -23,7 +25,7 @@ def get_model_parms(name: str):
     return hyperparameters.get(name, None)
 
 
-def get_train_hparms(name: str):
+def get_train_hparms(name: str) -> Dict[str, Any]:
     hyperparameters = {
         "hyperparameters_resnet_lstm": {
             'n_frames': 20,
