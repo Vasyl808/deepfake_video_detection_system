@@ -1,20 +1,26 @@
-
 import torch
 import torch.nn as nn
 import numpy as np
 from tqdm import tqdm
 import argparse
+
 from parse_config import get_model_parms, get_train_hparms
 from dataset.dataset_processing import get_data_path
 from models.resnet_3d_cnn import ResNet3DClassifier
 from models.effb3_lstm import B3LSTMClassifier
 from models.resnet50xt_lstm import ResNetLSTMClassifier
+
 from sklearn.metrics import classification_report, roc_auc_score
 import torchvision.transforms as transforms
 from typing import Dict, Tuple, Optional, Any, List
+
 from dataset.dataset import VideoDataset
 from utils.same_augmentation import SameAugmentation
 from utils.plot_metrics import plot_training_metrics, plot_confusion_matrix_final
+
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 def test_model(model: nn.Module, data_path: str, n_frames: int, size: Tuple[int, int]):

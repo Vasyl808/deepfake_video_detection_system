@@ -8,17 +8,22 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 from tqdm import tqdm
+from sklearn.metrics import classification_report, roc_auc_score
+import torchvision.transforms as transforms
 import argparse
+from typing import Dict, Tuple, Optional, Any, List
+
 from parse_config import get_model_parms, get_train_hparms
 from dataset.dataset_processing import get_data_path
 from models.resnet_3d_cnn import ResNet3DClassifier
 from models.effb3_lstm import B3LSTMClassifier
 from models.resnet50xt_lstm import ResNetLSTMClassifier
-from sklearn.metrics import classification_report, roc_auc_score
-import torchvision.transforms as transforms
-from typing import Dict, Tuple, Optional, Any, List
 from trainer.trainer import Trainer
 from utils.plot_metrics import plot_training_metrics, plot_confusion_matrix_final
+
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 def main() -> None:
