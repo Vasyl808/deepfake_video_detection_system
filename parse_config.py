@@ -51,7 +51,7 @@ def get_train_hparms(name: str) -> Dict[str, Any]:
             'n_frames': 20,
             'batch_size': 8,
             'lr': 0.001,
-            'weight_decay': 1e-5,
+            'weight_decay': 1e-3,
             'num_epochs': 40,
             'size': (112, 112),
             'gamma': 0.1,
