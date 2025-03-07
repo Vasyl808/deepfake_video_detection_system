@@ -76,7 +76,7 @@ def main() -> None:
     early_stopping_params: Dict[str, Any] = {
         'patience': 15,
         'verbose': True,
-        'delta': 0.0001,
+        'delta': 0.00001,
         'path': 'custom_early_stopping_checkpoint.pt'
     }
 

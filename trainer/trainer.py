@@ -75,7 +75,7 @@ class Trainer:
             early_stopping_params = {
                 'patience': 15,
                 'verbose': True,
-                'delta': 0.0001,
+                'delta': 0.00001,
                 'path': f'early_stopping_{self.name}_checkpoint.pt'
             }
 
