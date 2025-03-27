@@ -111,8 +111,9 @@ class VideoAnalyzer:
             gradcam=grad_cam_results
         )
     
-    def analyze(self, video_path: str) -> AnalysisResponse:
-        frames = extract_frames(video_path, num_frames=20)
+    def analyze(self, video_path: str, start_time: int, duration: int) -> AnalysisResponse:
+        end_time = start_time + duration
+        frames = extract_frames(video_path, start_time, end_time, num_frames=20)
         if not frames:
             raise ValueError("Не вдалося отримати кадри з відео")
         sequences_results = []

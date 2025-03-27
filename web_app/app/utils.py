@@ -101,55 +101,89 @@ def process_frame(frame):
     return faces
 
 
-def extract_frames(video_path, num_frames=20):
+def process_roi(frame, roi):
+    x1, y1, x2, y2 = roi
+    # Забезпечуємо, що координати - це цілі значення
+    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+    # Вирізаємо область
+    cropped = frame[y1:y2, x1:x2]
+    processed_faces = process_frame(cropped)
+    # Коригуємо координати виявлених облич відносно повного кадру
+    adjusted_faces = []
+    if processed_faces is not None:
+        for face, box in processed_faces:
+            adjusted_box = (box[0] + x1, box[1] + y1, box[2] + x1, box[3] + y1)
+            adjusted_faces.append((face, adjusted_box))
+    return adjusted_faces
+
+
+def extract_frames(video_path, start_time, end_time, num_frames=20, margin=20):
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         return []
 
     fps = cap.get(cv2.CAP_PROP_FPS)
-
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     video_duration_sec = total_frames / fps
 
-    max_duration_sec = 10.0
-    if video_duration_sec > max_duration_sec:
-        frames_to_consider = int(fps * max_duration_sec)
-    else:
-        frames_to_consider = total_frames
+    if end_time > video_duration_sec:
+        end_time = video_duration_sec
+
+    segment_duration = end_time - start_time
+    if segment_duration <= 0:
+        cap.release()
+        return []
+
+    start_frame = int(start_time * fps)
+    end_frame = int(end_time * fps)
+    frames_to_consider = end_frame - start_frame
 
     frame_indices = np.linspace(0, frames_to_consider - 1, num_frames, dtype=int)
 
     face_sequences = {}
-
-    for frame_index in frame_indices:
+    # Обробка першого кадру: повний пошук облич
+    first_frame_index = start_frame + frame_indices[0]
+    cap.set(cv2.CAP_PROP_POS_FRAMES, first_frame_index)
+    ret, frame = cap.read()
+    if not ret:
+        cap.release()
+        return []
+    
+    processed_faces = process_frame(frame)
+    if processed_faces is not None:
+        for face, box in processed_faces:
+            face_sequences[len(face_sequences)] = {
+                "roi": box,
+                "faces": [face]
+            }
+    # Обробка наступних кадрів з використанням ROI
+    for idx in frame_indices[1:]:
+        frame_index = start_frame + idx
         cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
         ret, frame = cap.read()
         if not ret:
             continue
 
-        processed_faces = process_frame(frame)
-        if processed_faces is not None:
-            for face, box in processed_faces:
-                is_unique = True
-                current_center = np.array([(box[0] + box[2]) / 2, (box[1] + box[3]) / 2])
-                for key, (prev_box, faces) in face_sequences.items():
-                    prev_center = np.array([(prev_box[0] + prev_box[2]) / 2, (prev_box[1] + prev_box[3]) / 2])
-                    distance = np.linalg.norm(current_center - prev_center)
-                    if distance <= 50:
-                        is_unique = False
-                        faces.append(face)
-                        break
-                if is_unique:
-                    face_sequences[len(face_sequences)] = (box, [face])
+        for seq in face_sequences.values():
+            x1, y1, x2, y2 = seq["roi"]
+            height, width = frame.shape[:2]
+            new_x1 = max(int(x1) - margin, 0)
+            new_y1 = max(int(y1) - margin, 0)
+            new_x2 = min(int(x2) + margin, width)
+            new_y2 = min(int(y2) + margin, height)
+            roi = (new_x1, new_y1, new_x2, new_y2)
+
+            detected_faces = process_roi(frame, roi)
+            if detected_faces:
+                face, new_box = detected_faces[0]
+                seq["faces"].append(face)
+                seq["roi"] = new_box
+            else:
+                seq["faces"].append(seq["faces"][-1])
 
     cap.release()
+    for seq in face_sequences.values():
+        if len(seq["faces"]) < num_frames:
+            seq["faces"].extend([seq["faces"][-1]] * (num_frames - len(seq["faces"])))
 
-    face_sequences = {key: faces for key, (_, faces) in face_sequences.items()}
-
-    for key, seq in face_sequences.items():
-        if len(seq) < num_frames:
-            last_frame = seq[-1]
-            seq.extend([last_frame] * (num_frames - len(seq)))
-
-    return list(face_sequences.values())
-    
+    return [seq["faces"] for seq in face_sequences.values()]

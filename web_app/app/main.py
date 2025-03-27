@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 import shutil
 from starlette import status
@@ -11,15 +11,18 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://3000-vasyl808-fastapiapp-yey39s72moa.ws-eu118.gitpod.io",
-    "http://localhost:3000",],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 @app.post("/analyze", response_model=AnalysisResponse, status_code=status.HTTP_200_OK)
-async def analyze_video(file: UploadFile = File(...)):
+async def analyze_video(
+    file: UploadFile = File(...),
+    startTime: float = Form(...),
+    duration: float = Form(...)
+):
     if not file.filename.endswith((".mp4", ".avi", ".mov")):
         raise HTTPException(status_code=400, detail="Непідтримуваний формат відео")
     
@@ -29,7 +32,9 @@ async def analyze_video(file: UploadFile = File(...)):
     
     try:
         analyzer = VideoAnalyzer()
-        result = analyzer.analyze(temp_file_path)
+        # Ви можете використати значення startTime і duration для обрізання відео на сервері,
+        # наприклад, змінити функцію extract_frames для прийому цих параметрів.
+        result = analyzer.analyze(temp_file_path, start_time=int(startTime), duration=int(duration))
     finally:
         os.remove(temp_file_path)
     

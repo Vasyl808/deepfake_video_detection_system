@@ -2,7 +2,7 @@ import React from 'react';
 import Header from '../components/Header';
 import VideoUpload from '../components/VideoUpload';
 import Footer from '../components/Footer';
-import './HomePage.css';
+import '../styles/HomePage.css';
 
 function HomePage() {
   return (
