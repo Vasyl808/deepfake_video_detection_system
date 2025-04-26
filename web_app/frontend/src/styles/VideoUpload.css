@@ -1,14 +1,18 @@
 /* Загальні стилі */
-.home-page {
+.upload-section {
+  width: 92%;
+  max-width: 900px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin: 2rem auto;
+}
+
+.upload-form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-}
-.main-content {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  gap: 1.5rem;
 }
 
 /* Анімація fade-in */
@@ -21,100 +25,474 @@
   animation: fadeIn 0.5s ease-in-out;
 }
 
-.upload-section {
-  width: 90%;
-  max-width: 900px;
-  background-color: #ffffff;
+/* Вкладки методів завантаження */
+.upload-tabs {
+  display: flex;
   border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 2rem auto;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eaeaea;
 }
 
-.upload-form {
+.upload-tab {
+  flex: 1;
+  padding: 1rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  gap: 0.5rem;
+  color: #6c757d;
+}
+
+.upload-tab.active {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+}
+
+.upload-tab:first-child {
+  border-right: 1px solid #eaeaea;
+}
+
+.upload-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.upload-content {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Область перетягування файлів */
+.drop-area {
+  border: 2px dashed #c5d2e0;
+  border-radius: 12px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f8fbff;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
-}
-
-.drop-area {
-  border: 2px dashed #007acc;
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  width: 100%;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  color: #555;
+  height: 100%;
+  position: relative;
 }
 
 .drop-area:hover {
-  transform: scale(1.02);
+  border-color: #007bff;
+  background-color: rgba(0, 123, 255, 0.05);
+  transform: translateY(-2px);
 }
 
 .drop-area.active {
-  background-color: rgba(0, 122, 204, 0.1);
+  border-color: #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 15px rgba(0, 123, 255, 0.2);
 }
 
-.file-input {
-  display: none;
+.drop-area.has-file {
+  border-color: #28a745;
+  background-color: rgba(40, 167, 69, 0.05);
 }
 
-.submit-button {
-  background-color: #28a745;
-  color: #fff;
-  padding: 0.8rem 1.5rem;
+.upload-big-icon {
+  width: 48px;
+  height: 48px;
+  color: #007bff;
+  margin-bottom: 1rem;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #28a745;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size-limit {
+  font-size: 0.85rem;
+  color: #6c757d;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  margin: 0;
+}
+
+/* Поле вводу URL */
+.url-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.url-input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  padding-left: 0.75rem;
+}
+
+.url-icon {
+  width: 22px;
+  height: 22px;
+  color: #6c757d;
+  margin-right: 0.5rem;
+}
+
+.url-input {
+  flex: 1;
+  padding: 1rem 0.75rem;
   border: none;
-  border-radius: 4px;
   font-size: 1rem;
+  outline: none;
+}
+
+.url-submit-btn {
+  padding: 0.85rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  width: 100%;
-  max-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.submit-button:disabled {
-  opacity: 0.7;
+.url-submit-btn:hover:not(:disabled) {
+  background-color: #0069d9;
+}
+
+.url-submit-btn:disabled {
+  background-color: #b0c4de;
   cursor: not-allowed;
+}
+
+.url-btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Іконки соціальних мереж */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.social-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.7;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.social-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.youtube {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red"><path d="M23,9.71a8.5,8.5,0,0,0-.91-4.13,2.92,2.92,0,0,0-1.72-1A78.36,78.36,0,0,0,12,4.27a78.45,78.45,0,0,0-8.34.3,2.87,2.87,0,0,0-1.46.74c-.9.83-1,2.25-1.1,3.45a48.29,48.29,0,0,0,0,6.48,9.55,9.55,0,0,0,.3,2,3.14,3.14,0,0,0,.71,1.36,2.86,2.86,0,0,0,1.49.78,45.18,45.18,0,0,0,6.5.33c3.5.05,6.57,0,10.2-.28a2.88,2.88,0,0,0,1.53-.78,2.49,2.49,0,0,0,.61-1,10.58,10.58,0,0,0,.52-3.4C23,13.69,23,10.31,23,9.71ZM9.74,14.85V8.66l5.92,3.11C14,12.69,11.81,13.73,9.74,14.85Z"/></svg>');
+}
+
+.instagram {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23E4405F"><path d="M12,2.16c3.2,0,3.58,0,4.85.07,3.25.15,4.77,1.69,4.92,4.92.06,1.27.07,1.65.07,4.85s0,3.59-.07,4.85c-.15,3.23-1.66,4.77-4.92,4.92-1.27.06-1.64.07-4.85.07s-3.58,0-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s0-3.58.07-4.85C2.38,3.92,3.9,2.38,7.15,2.23,8.42,2.18,8.8,2.16,12,2.16ZM12,0C8.74,0,8.33,0,7.05.07c-4.35.2-6.78,2.62-7,7C0,8.33,0,8.74,0,12S0,15.67.07,17c.2,4.36,2.62,6.78,7,7C8.33,24,8.74,24,12,24s3.67,0,4.95-.07c4.35-.2,6.78-2.62,7-7C24,15.67,24,15.26,24,12s0-3.67-.07-4.95c-.2-4.35-2.62-6.78-7-7C15.67,0,15.26,0,12,0Zm0,5.84A6.16,6.16,0,1,0,18.16,12,6.16,6.16,0,0,0,12,5.84ZM12,16a4,4,0,1,1,4-4A4,4,0,0,1,12,16ZM18.41,4.15a1.44,1.44,0,1,0,1.43,1.44A1.44,1.44,0,0,0,18.41,4.15Z"/></svg>');
+}
+
+/* Іконки соціальних мереж (продовження) */
+.tiktok {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M19.59,6.69a4.83,4.83,0,0,1-3.77-4.25V2h-3.45V13.67a2.89,2.89,0,0,1-5-2,2.89,2.89,0,0,1,2.12-2.76v-3.6a6.37,6.37,0,0,0-5.3,7.63A6.3,6.3,0,0,0,12.15,19,6.34,6.34,0,0,0,18.5,12.63V8.23a8.16,8.16,0,0,0,4.5,1.39V6.18A4.83,4.83,0,0,1,19.59,6.69Z"/></svg>');
+}
+
+.facebook {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231877F2"><path d="M24,12.07A12,12,0,1,0,10.13,24V15.56H7.08V12.07h3.05V9.41c0-3,1.8-4.67,4.54-4.67a18.32,18.32,0,0,1,2.68.24V8h-1.5a1.73,1.73,0,0,0-2,1.87v2.24h3.36l-.54,3.49H13.83V24A12,12,0,0,0,24,12.07Z"/></svg>');
+}
+
+/* Повідомлення про помилку */
+.error-message {
+  background-color: #fff2f2;
+  color: #d8000c;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  border-left: 4px solid #d8000c;
+  font-size: 0.95rem;
+  animation: fadeIn 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(216, 0, 12, 0.1);
+}
+
+.error-message::before {
+  content: '⚠️';
+  margin-right: 0.7rem;
+  font-size: 1.1rem;
+}
+
+/* Перегляд відео */
+.video-preview {
+  margin-top: 0.5rem;
+  padding: 1.5rem;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #eaeaea;
+}
+
+.preview-title {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #495057;
+  font-weight: 600;
+}
+
+.video-player {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #000;
+  max-height: 500px;
+}
+
+/* Елементи керування обрізкою відео */
+.trim-controls {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.trim-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #495057;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.slider-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.time-slider {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #dee2e6;
+  outline: none;
+  margin: 1rem 0 0.5rem;
+}
+
+.time-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.time-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #0069d9;
+}
+
+.time-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.time-display {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  font-size: 0.95rem;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.time-value {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.manual-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+  margin-left: auto;
+}
+
+.manual-time-input {
+  width: 60px;
+  padding: 0.4rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* Кнопка відправки */
+.submit-button {
+  background-color: #28a745;
+  color: white;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
 }
 
 .submit-button:hover:not(:disabled) {
   background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
 }
 
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 3px rgba(40, 167, 69, 0.2);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #8fbd9a;
+}
+
+.check-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Спіннер завантаження */
 .spinner-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 1rem;
+  padding: 2rem;
+  margin: 2rem 0;
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 6px solid #ccc;
-  border-top-color: #007acc;
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(0, 123, 255, 0.1);
+  border-top-color: #007bff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.spinner-small {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
+.processing-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+}
+
+.wait-text {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Секція результатів */
 .results {
-  margin-top: 2rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.results-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .sequence-card {
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 1.5rem;
   margin-bottom: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #fafafa;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+  background-color: white;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border-left: 5px solid #6c757d;
+}
+
+.sequence-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sequence-card.fake {
+  border-left-color: #dc3545;
+}
+
+.sequence-card.real {
+  border-left-color: #28a745;
 }
 
 .sequence-header {
@@ -124,52 +502,201 @@
   margin-bottom: 1rem;
 }
 
+.sequence-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sequence-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #343a40;
+}
+
+.sequence-type {
+  padding: 0.35rem 0.8rem;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.sequence-type.fake {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.sequence-type.real {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
 .toggle-details-btn {
-  background-color: #007acc;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 0.4rem 0.8rem;
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .toggle-details-btn:hover {
-  background-color: #005fa3;
-  transform: scale(1.05);
+  background-color: #e9ecef;
 }
 
+/* Деталі послідовності */
 .sequence-details {
-  overflow: hidden;
-  transition: max-height 0.5s ease;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.frames-section, .gradcam-section {
+  margin-bottom: 2rem;
+}
+
+.frames-title, .gradcam-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 1rem;
 }
 
 .frames-container {
   display: flex;
   gap: 1rem;
   overflow-x: auto;
-  padding: 1rem 0;
+  padding: 0.5rem 0 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #007bff #f0f0f0;
+}
+
+.frames-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.frames-container::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 3px;
+}
+
+.frames-container::-webkit-scrollbar-thumb {
+  background-color: #007bff;
+  border-radius: 3px;
 }
 
 .frame-card {
   text-align: center;
+  min-width: 240px;
+  transition: transform 0.3s;
+}
+
+.frame-card:hover {
+  transform: scale(1.03);
 }
 
 .frame-image {
   width: 224px;
   height: 224px;
   object-fit: cover;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.gradcam-container {
-  text-align: center;
-  margin-top: 1rem;
+.frame-number {
+  margin-top: 0.5rem;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.gradcam-info {
+  background-color: #f8f9fa;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.gradcam-description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #495057;
+  font-style: italic;
+}
+
+.explanation-box {
+  background-color: #e9f5ff;
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.explanation-title {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+  color: #0056b3;
 }
 
 .explanation {
-  font-style: italic;
-  color: #555;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #343a40;
+}
+
+/* Адаптивність для мобільних пристроїв */
+@media (max-width: 768px) {
+  .upload-section {
+    padding: 1.5rem;
+    width: 95%;
+  }
+  
+  .upload-tab {
+    padding: 0.8rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .upload-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .drop-area {
+    padding: 2rem 1rem;
+  }
+  
+  .url-input-container {
+    flex-direction: column;
+    padding-left: 0;
+  }
+  
+  .url-icon {
+    display: none;
+  }
+  
+  .url-input {
+    padding: 0.8rem;
+    border-bottom: 1px solid #ced4da;
+  }
+  
+  .url-submit-btn {
+    width: 100%;
+    border-radius: 0;
+  }
+  
+  .sequence-header, .sequence-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .toggle-details-btn {
+    align-self: flex-end;
+    margin-top: -2.5rem;
+  }
 }
