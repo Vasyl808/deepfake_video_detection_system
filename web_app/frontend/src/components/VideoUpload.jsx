@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
+import JSZip from 'jszip';
 import '../styles/VideoUpload.css';
 
-const API_URL = 'https://8000-vasyl808-deepfakevideod-jlmmzvo0yfl.ws-eu118.gitpod.io';
+const API_URL = 'https://8000-vasyl808-deepfakevideod-8o49blmbkib.ws-eu118.gitpod.io';
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB в байтах
 
 export default function VideoUpload() {
@@ -19,6 +20,10 @@ export default function VideoUpload() {
   const [expanded, setExpanded] = useState({});
   const [uploadMethod, setUploadMethod] = useState('file');
   const [error, setError] = useState('');
+
+  // Download state for each sequence (so different sequences can have their own loading/error state)
+  const [downloadLoadingIdx, setDownloadLoadingIdx] = useState(null);
+  const [downloadErrorIdx, setDownloadErrorIdx] = useState({});
 
   useEffect(() => {
     return () => {
@@ -99,7 +104,7 @@ export default function VideoUpload() {
     setSocialMediaURL(e.target.value);
   }, []);
 
-  // ОНОВЛЕНИЙ БЛОК: Завантаження відео з соцмережі без кукі
+  // Соцмережа
   const fetchVideoFromURL = async () => {
     if (!socialMediaURL.trim()) {
       setError('Будь ласка, введіть URL відео');
@@ -160,7 +165,6 @@ export default function VideoUpload() {
       const data = await response.json();
       setResult(data);
     } catch (err) {
-      console.error(err);
       setError(`Сталася помилка: ${err.message}`);
     } finally {
       setLoading(false);
@@ -183,13 +187,93 @@ export default function VideoUpload() {
     }
   }, [resetState, videoURL]);
 
+  // --- Download all frames/gradcam of a sequence in ZIP ---
+  function base64ToBlob(base64, contentType = 'image/jpeg') {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: contentType });
+  }
+
+  function addExplanationToZip(zip, explanationText) {
+    if (explanationText) {
+      zip.file('explanation.txt', explanationText);
+    }
+  }
+
+  // Завантажити звичайні кадри однієї послідовності
+  const handleDownloadFrames = async (seqIdx) => {
+    setDownloadLoadingIdx(seqIdx);
+    setDownloadErrorIdx(prev => ({ ...prev, [seqIdx]: '' }));
+    try {
+      const seq = result?.sequences?.[seqIdx];
+      if (!seq) throw new Error('Не знайдено послідовність для завантаження');
+      const framesArray = seq.frames;
+      if (!framesArray || !framesArray.length) throw new Error('Немає кадрів для завантаження');
+      const zip = new JSZip();
+      for (let i = 0; i < framesArray.length; ++i) {
+        const { frame_number, image } = framesArray[i];
+        const blob = base64ToBlob(image);
+        zip.file(`frame_${frame_number}.jpg`, blob);
+      }
+      const content = await zip.generateAsync({ type: 'blob' });
+      const url = window.URL.createObjectURL(content);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sequence_${seqIdx + 1}_frames.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setDownloadErrorIdx(prev => ({ ...prev, [seqIdx]: `Помилка завантаження кадрів: ${err.message}` }));
+    } finally {
+      setDownloadLoadingIdx(null);
+    }
+  };
+
+  // Завантажити Grad-CAM кадри однієї послідовності + пояснення
+  const handleDownloadGradcam = async (seqIdx) => {
+    setDownloadLoadingIdx(seqIdx);
+    setDownloadErrorIdx(prev => ({ ...prev, [seqIdx]: '' }));
+    try {
+      const seq = result?.sequences?.[seqIdx];
+      if (!seq) throw new Error('Не знайдено послідовність для завантаження');
+      const gradcamArray = seq.gradcam;
+      if (!gradcamArray || !gradcamArray.length) throw new Error('Немає Grad-CAM кадрів для завантаження');
+      const zip = new JSZip();
+      for (let i = 0; i < gradcamArray.length; ++i) {
+        const { frame_number, image } = gradcamArray[i];
+        const blob = base64ToBlob(image);
+        zip.file(`gradcam_${frame_number}.jpg`, blob);
+      }
+      addExplanationToZip(zip, seq.explanation);
+      const content = await zip.generateAsync({ type: 'blob' });
+      const url = window.URL.createObjectURL(content);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sequence_${seqIdx + 1}_gradcam.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setDownloadErrorIdx(prev => ({ ...prev, [seqIdx]: `Помилка завантаження Grad-CAM: ${err.message}` }));
+    } finally {
+      setDownloadLoadingIdx(null);
+    }
+  };
+
   return (
     <div className="upload-section">
       {error && <div className="error-message">{error}</div>}
 
       <form
-          onSubmit={handleSubmit}
-          className={`upload-form${uploadMethod === 'url' ? ' url-mode' : ''}`}>
+        onSubmit={handleSubmit}
+        className={`upload-form${uploadMethod === 'url' ? ' url-mode' : ''}`}>
         <div className="upload-tabs">
           <button
             type="button"
@@ -251,8 +335,8 @@ export default function VideoUpload() {
             <div className="url-input-wrapper">
               <div className="url-input-container">
                 <svg xmlns="http://www.w3.org/2000/svg" className="url-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                 </svg>
                 <input
                   type="text"
@@ -272,7 +356,7 @@ export default function VideoUpload() {
                     <polyline points="14 2 14 8 20 8"></polyline>
                     <line x1="9" y1="15" x2="15" y2="15"></line>
                   </svg>
-                </button>
+              </button>
               </div>
               <div className="social-icons">
                 <span className="social-icon youtube"></span>
@@ -370,7 +454,7 @@ export default function VideoUpload() {
                 <div className="sequence-info">
                   <h3>Послідовність {idx + 1}</h3>
                   <div className={`sequence-type ${seq.is_fake ? 'fake' : 'real'}`}>
-                    {seq.is_fake ? 'Фейк' : 'Реальне відео'}
+                    {seq.is_fake ? 'Фейк' : 'Реальна'}
                   </div>
                 </div>
                 <button onClick={() => toggle(idx)} className="toggle-details-btn">
@@ -398,11 +482,6 @@ export default function VideoUpload() {
 
                   <div className="gradcam-section">
                     <h4 className="gradcam-title">Grad-CAM візуалізація</h4>
-                    <div className="gradcam-info">
-                      <p className="gradcam-description">
-                        Яскраві області показують ділянки, які алгоритм вважає підозрілими
-                      </p>
-                    </div>
                     <div className="frames-container">
                       {seq.gradcam?.map(({ frame_number, image }) => (
                         <div key={frame_number} className="frame-card">
@@ -416,10 +495,49 @@ export default function VideoUpload() {
                       ))}
                     </div>
                     <div className="explanation-box">
-                      <h5 className="explanation-title">Пояснення:</h5>
+                      <h5 className="explanation-title">Результат аналізу:</h5>
                       <p className="explanation">{seq.explanation}</p>
                     </div>
                   </div>
+
+                  {/* --- DOWNLOAD BUTTONS --- */}
+                  <div className="download-frames-section">
+                    <h4>Завантажити кадри цієї послідовності</h4>
+                    <div className="download-frames-controls">
+                      <button
+                        className={`download-frames-btn modern-blue ${downloadLoadingIdx === idx ? 'loading' : ''}`}
+                        disabled={downloadLoadingIdx === idx}
+                        onClick={() => handleDownloadFrames(idx)}
+                        type="button"
+                      >
+                        {downloadLoadingIdx === idx
+                          ? (<><span className="loader-dots"></span> Завантаження...</>)
+                          : (<><svg className="download-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 4v8m0 0l-3-3m3 3l3-3m-8 6h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg> Завантажити кадри</>)
+                        }
+                      </button>
+                      <button
+                        className={`download-frames-btn modern-green ${downloadLoadingIdx === idx ? 'loading' : ''}`}
+                        disabled={downloadLoadingIdx === idx}
+                        onClick={() => handleDownloadGradcam(idx)}
+                        type="button"
+                      >
+                        {downloadLoadingIdx === idx
+                          ? (<><span className="loader-dots"></span> Завантаження...</>)
+                          : (<><svg className="download-icon" width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 4v8m0 0l-3-3m3 3l3-3m-8 6h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg> Кадри з Grad-CAM</>)
+                        }
+                      </button>
+                    </div>
+                    {downloadErrorIdx[idx] && (
+                      <div className="error-message">{downloadErrorIdx[idx]}</div>
+                    )}
+                    <div className={`download-explanation ${downloadLoadingIdx === idx ? 'active' : ''}`}>
+                      <svg className="info-icon" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight: 6, verticalAlign:'middle'}} viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                      <span>
+                        Ви можете завантажити <b>всі кадри цієї послідовності</b> у zip-архіві, або отримати <b>Grad-CAM</b> з поясненням для глибшого аналізу!
+                      </span>
+                    </div>
+                  </div>
+                  {/* --- END DOWNLOAD BUTTONS --- */}
                 </div>
               )}
             </div>
