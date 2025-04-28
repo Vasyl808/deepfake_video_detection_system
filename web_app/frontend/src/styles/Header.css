@@ -1,7 +1,7 @@
 .header {
   background-color: #282c34;
   color: #fff;
-  padding: 0.8rem 1.5rem;
+  padding: 0.8rem 0;       /* Прибираємо боковий відступ, щоб лого було в самого краю */
   width: 100%;
   position: fixed;
   top: 0;
@@ -12,7 +12,6 @@
 }
 
 .header-scrolled {
-  padding: 0.5rem 1.5rem;
   background-color: rgba(40, 44, 52, 0.97);
   backdrop-filter: blur(8px);
 }
@@ -21,14 +20,30 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100vw;             /* Гарантовано на всю ширину */
+  padding: 0 1.5rem;            /* ОДИН падінг для всіх елементів праворуч і ліворуч */
+  margin: 0 auto;               /* Центрує контент, але padding залишає лого біля краю */
+  box-sizing: border-box;
 }
 
 .header-logo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin-left: 0;               /* Важливо для прикріплення до краю */
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo-image {
+  height: 32px;
+  width: auto;
+  border-radius: 6px;
 }
 
 .header-logo h1 {
@@ -36,23 +51,15 @@
   font-weight: 700;
   margin: 0;
   background: linear-gradient(90deg, #ffffff, #a9c9ff);
-  background-clip: text; /* Standard property */
-  -webkit-background-clip: text; /* Webkit-specific property for older Safari versions */
-  -moz-background-clip: text; /* Mozilla-specific property (if supported in future Firefox versions) */
-  -ms-background-clip: text; /* Microsoft-specific property (older versions of IE) */
+  background-clip: text;
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: 0.5px;
 }
 
-.logo-placeholder {
-  height: 32px;
-  width: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #61dafb;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+.header-logo a {
+  text-decoration: none;
+  color: inherit;
 }
 
 .header-nav {
@@ -78,11 +85,7 @@
   padding: 0.25rem 0;
 }
 
-.nav-link:hover {
-  color: #ffffff;
-}
-
-.nav-link.active {
+.nav-link:hover, .nav-link.active {
   color: #ffffff;
 }
 
@@ -121,6 +124,7 @@
   color: #ffffff;
 }
 
+/* Адаптивність */
 @media (max-width: 768px) {
   .nav-links {
     gap: 1rem;
@@ -128,6 +132,14 @@
   
   .header-logo h1 {
     font-size: 1rem;
+  }
+
+  .logo-image {
+    height: 28px;
+  }
+
+  .header-container {
+    padding: 0 1rem;
   }
 }
 
@@ -137,6 +149,14 @@
   }
   
   .header {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .header-container {
+    padding: 0 0.5rem;
+  }
+
+  .logo-image {
+    height: 24px;
   }
 }

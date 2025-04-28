@@ -18,6 +18,7 @@ html, body {
 
 .main-content {
   flex: 1;
+  padding-top: 32px;
 }
 
 .hero-section {
@@ -113,22 +114,32 @@ html, body {
 }
 
 /* Секція завантаження */
+/* зменшена й відцентрованa обгортка для VideoUpload */
 .upload-section {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto 2.5rem;
-  padding: 2rem 20px;
+  margin: 3rem auto;
+  padding: 0.5rem 0.5rem;
+  box-sizing: border-box;
+  /* фон, бордери залишаємо як є або прибираємо */
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   text-align: center;
+}
+
+/* новий клас-обгортка */
+.upload-wrapper {
+  width: 100%;
+  max-width: 500px;    /* <- тут указываєте бажану ширину */
+  margin: 0 auto;      /* центрування по горизонталі */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   box-sizing: border-box;
 }
 
-.upload-section h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: #333;
+.upload-wrapper > * {
+  width: 100%;
 }
 
 /* Секція з фічами */
@@ -148,18 +159,25 @@ html, body {
 }
 
 .features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;        
+  justify-content: center;   
   gap: 1.5rem;
+  align-items: stretch;
 }
 
 .feature-card {
+  flex: 0 1 280px;  
   background-color: #ffffff;
   border-radius: 10px;
   padding: 1.5rem;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;         
+  flex-direction: column; 
+  justify-content: space-between; 
+  height: 100%;           
 }
 
 .feature-card:hover {

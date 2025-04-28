@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import '../styles/VideoUpload.css';
 
-const API_URL = 'https://8000-vasyl808-deepfakevideod-r9lg3r2z6ks.ws-eu118.gitpod.io';
+const API_URL = 'https://8000-vasyl808-deepfakevideod-jlmmzvo0yfl.ws-eu118.gitpod.io';
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB в байтах
 
 export default function VideoUpload() {
@@ -187,7 +187,9 @@ export default function VideoUpload() {
     <div className="upload-section">
       {error && <div className="error-message">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="upload-form">
+      <form
+          onSubmit={handleSubmit}
+          className={`upload-form${uploadMethod === 'url' ? ' url-mode' : ''}`}>
         <div className="upload-tabs">
           <button
             type="button"
