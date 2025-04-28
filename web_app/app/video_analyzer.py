@@ -100,7 +100,7 @@ class VideoAnalyzer:
         explanation = (
             "Послідовність визначено як фейк."
             if is_fake 
-            else "Послідовність виглядає реальним."
+            else "Послідовність облич вигладає реальною."
         )
         
         return SequenceAnalysis(
