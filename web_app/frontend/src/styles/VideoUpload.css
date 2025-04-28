@@ -650,6 +650,115 @@
   color: #343a40;
 }
 
+.download-frames-section {
+  margin-top: 24px;
+  background: #f7faff;
+  border-radius: 10px;
+  padding: 18px 18px 12px 18px;
+  box-shadow: 0 2px 12px #e0e6f7;
+  border: 1px solid #eaf3ff;
+}
+
+.download-frames-controls {
+  display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.download-frames-btn {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px #e0eafa;
+  transition: background 0.14s, color 0.14s, box-shadow 0.14s;
+  position: relative;
+  min-width: 210px;
+  max-width: 320px;     /* за бажанням */
+}
+
+.download-frames-btn .download-icon {
+  margin-right: 8px;
+  stroke-width: 2.3;
+}
+
+.download-frames-btn.modern-blue {
+  background: linear-gradient(90deg, #3793ff 0%, #67c6ff 100%);
+  color: #fff;
+}
+
+.download-frames-btn.modern-blue:hover:not(:disabled) {
+  background: linear-gradient(90deg, #267be7 0%, #4699dd 100%);
+}
+
+.download-frames-btn.modern-green {
+  background: linear-gradient(90deg, #41e396 0%, #1dbb73 100%);
+  color: #fff;
+}
+
+.download-frames-btn.modern-green:hover:not(:disabled) {
+  background: linear-gradient(90deg, #27c585 0%, #159e5e 100%);
+}
+
+.download-frames-btn.loading {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.loader-dots {
+  display: inline-block;
+  width: 20px;
+  height: 12px;
+  vertical-align: -2px;
+  background:
+    radial-gradient(circle closest-side, #fff 90%, transparent 100%) 0% 50%,
+    radial-gradient(circle closest-side, #fff 90%, transparent 100%) 50% 50%,
+    radial-gradient(circle closest-side, #fff 90%, transparent 100%) 100% 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  animation: loader-dots-move 1.0s infinite linear;
+}
+@keyframes loader-dots-move {
+  0%   { background-position:   0% 50%,  50% 50%, 100% 50%; opacity: 1;}
+  20%  { background-position:  20% 50%,  50% 50%, 100% 50%; }
+  40%  { background-position:  40% 50%,  50% 50%, 100% 50%; }
+  60%  { background-position:  60% 50%,  80% 50%, 100% 50%; }
+  80%  { background-position:  80% 50%, 100% 50%, 120% 50%; }
+  100% { background-position:   0% 50%,  50% 50%, 100% 50%; }
+}
+
+.download-explanation {
+  background: #e7f5ff;
+  color: #2262a9;
+  border-radius: 7px;
+  padding: 11px 14px;
+  margin-top: 9px;
+  font-size: 1.06em;
+  display: flex;
+  align-items: center;
+  border: 1px solid #b6e1ff;
+  box-shadow: 0 1px 6px #e3effc;
+  transition: background 0.19s, color 0.19s;
+}
+
+.download-explanation.active {
+  background: linear-gradient(90deg, #d1ecfa 0%, #e3fdec 100%);
+  color: #175b27;
+  border-color: #8cd5b9;
+  font-weight: 600;
+}
+
+.download-explanation .info-icon {
+  margin-right: 8px;
+  color: #3793ff;
+  flex-shrink: 0;
+}
+
 /* Адаптивність для мобільних пристроїв */
 @media (max-width: 768px) {
   .upload-section {
