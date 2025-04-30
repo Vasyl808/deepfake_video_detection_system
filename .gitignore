@@ -17,5 +17,7 @@ var/
 .installed.cfg
 *.egg
 
-web_app/app/best_ResNetLSTMNoBiClassifier20x224_lstm_checkpoint_epoch_step_23.pt
+web_app/backend/best_ResNetLSTMNoBiClassifier20x224_lstm_checkpoint_epoch_step_23.pt
 web_app/frontend/node_modules/
+web_app/backend/app/ml/weights/best_ResNetLSTMNoBiClassifier20x224_lstm_checkpoint_epoch_step_23.pt
+web_app/backend/.env
