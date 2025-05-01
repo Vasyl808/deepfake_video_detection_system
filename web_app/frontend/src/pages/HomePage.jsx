@@ -1,4 +1,3 @@
-// src/pages/HomePage.jsx
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import VideoUpload from '../components/VideoUpload';
