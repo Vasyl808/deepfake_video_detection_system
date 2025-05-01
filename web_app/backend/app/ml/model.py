@@ -9,15 +9,12 @@ import numpy as np
 class EffB3LSTMClassifier(nn.Module):
     def __init__(self, 
         lstm_hidden_dim: int, num_lstm_layers:  int,
-        dropout: float, bidirectional: bool, freeze: bool
+        dropout: float, bidirectional: bool
     ) -> None:
         super(EffB3LSTMClassifier, self).__init__()
 
         self.cnn = models.efficientnet_b3()
         self.feature_output_size = 1536
-
-        if freeze:
-            self.freeze_until("layer4.0.conv1.weight")
 
         self.feature_extractor = nn.Sequential(
             *list(self.cnn.children())[:-1],
