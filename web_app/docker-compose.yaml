@@ -3,12 +3,12 @@ version: "3.8"
 services:
   backend:
     build: 
-      context: ./app
+      context: ./backend
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/app
+      - ./backend:/app
     environment:
       - PYTHONUNBUFFERED=1
 
