@@ -7,8 +7,10 @@ import numpy as np
 
 
 class EffB3LSTMClassifier(nn.Module):
-    def __init__(self, n_linear_hidden, lstm_hidden_dim, num_lstm_layers,
-                 dropout, bidirectional, freeze):
+    def __init__(self, 
+        lstm_hidden_dim: int, num_lstm_layers:  int,
+        dropout: float, bidirectional: bool, freeze: bool
+    ) -> None:
         super(EffB3LSTMClassifier, self).__init__()
 
         self.cnn = models.efficientnet_b3()
@@ -37,7 +39,7 @@ class EffB3LSTMClassifier(nn.Module):
             nn.Linear(lstm_hidden_dim // 2, 1),
         )
 
-    def forward(self, vid_frames):
+    def forward(self, vid_frames: torch.tensor) -> torch.tensor:
         batch_size, num_frames, channels, height, width = vid_frames.shape
         vid_frames = vid_frames.view(batch_size * num_frames, channels, height, width)
 
@@ -49,4 +51,3 @@ class EffB3LSTMClassifier(nn.Module):
         output = self.classifier(lstm_out[:, -1, :])  # (batch_size, 1)
 
         return output
-

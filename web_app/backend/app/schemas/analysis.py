@@ -1,10 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-
-
-class FrameResult(BaseModel):
-    frame_number: int
-    image: str
+from app.schemas.frames import FrameResult
 
 
 class SequenceAnalysis(BaseModel):
