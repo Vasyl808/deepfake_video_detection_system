@@ -9,6 +9,7 @@ import torch.optim as optim
 from torch.nn import functional as F
 from facenet_pytorch import MTCNN
 from torchvision import transforms
+from torchvision.transforms.functional import to_pil_image
 
 
 def tensor_to_b64(frame_tensor):
@@ -20,17 +21,28 @@ def tensor_to_b64(frame_tensor):
     return base64.b64encode(buffer).decode("utf-8")
 
 
-def overlay_heatmap(frame_tensor, heatmap):
-    frame_np = frame_tensor.permute(1, 2, 0).detach().numpy()
+def overlay_heatmap(tensor, gradcam_map, out_path):
+    frame_np = tensor.permute(1, 2, 0).detach().cpu().numpy()
     frame_np = (frame_np - frame_np.min()) / (frame_np.max() - frame_np.min() + 1e-8)
     frame_np = np.uint8(255 * frame_np)
-    heatmap = np.uint8(255 * heatmap)
+
+    heatmap = np.uint8(255 * gradcam_map)
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
     heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
+
     overlay = cv2.addWeighted(frame_np, 0.5, heatmap, 0.5, 0)
     overlay = cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR)
-    _, buffer = cv2.imencode('.jpg', overlay)
-    return base64.b64encode(buffer).decode("utf-8")
+    
+    cv2.imwrite(out_path, overlay)
+
+
+def tensor_to_imagefile(tensor, out_path):
+    frame_np = tensor.permute(1, 2, 0).detach().cpu().numpy()
+    frame_np = (frame_np - frame_np.min()) / (frame_np.max() - frame_np.min() + 1e-8)
+    frame_np = np.uint8(255 * frame_np)
+    frame_np = cv2.cvtColor(frame_np, cv2.COLOR_RGB2BGR)
+    
+    cv2.imwrite(out_path, frame_np)
 
 
 def process_frame(frame):

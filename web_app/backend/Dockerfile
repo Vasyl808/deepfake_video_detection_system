@@ -19,6 +19,10 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 ENV PYTHONPATH=/app
+ENV REDIS_URL=redis://redis:6379/0
+
+RUN mkdir -p /app/temp && chmod 777 /app/temp
+RUN mkdir -p /app/analyzed_frames && chmod 777 /app/analyzed_frames
 
 EXPOSE 8000
 

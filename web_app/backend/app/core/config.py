@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Optional
 
 load_dotenv()
 
@@ -12,9 +12,14 @@ class FastAPIConfig(BaseSettings):
     port: int = os.getenv("PORT", 8000)
 
     TEMP_DIR: str = os.getenv("TEMP_DIR", "temp_videos")
+    RESULTS_DIR: str = os.environ.get("RESULTS_DIR", "./analyzed_frames")
     MAX_FILE_SIZE: int = os.getenv("MAX_FILE_SIZE", 500 * 1024 * 1024)
 
     secret_key: str = os.getenv("SECRET_KEY")
+
+    FILE_TTL: int = 3600
+    REDIS_PASSWORD: Optional[str] = os.getenv("REDIS_PASSWORD")
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
 
 class ModelConfig(BaseSettings):
