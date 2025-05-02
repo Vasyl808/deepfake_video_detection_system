@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import JSZip from 'jszip';
 import '../styles/VideoUpload.css';
 
-const API_URL = 'https://8000-vasyl808-deepfakevideod-8o49blmbkib.ws-eu118.gitpod.io';
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB в байтах
+const API_URL = 'https://8000-vasyl808-deepfakevideod-vxui3rgqzba.ws-eu118.gitpod.io';
+const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 
 export default function VideoUpload() {
   const inputId = useId();
@@ -20,8 +20,6 @@ export default function VideoUpload() {
   const [expanded, setExpanded] = useState({});
   const [uploadMethod, setUploadMethod] = useState('file');
   const [error, setError] = useState('');
-
-  // Download state for each sequence (so different sequences can have their own loading/error state)
   const [downloadLoadingIdx, setDownloadLoadingIdx] = useState(null);
   const [downloadErrorIdx, setDownloadErrorIdx] = useState({});
 
@@ -188,14 +186,13 @@ export default function VideoUpload() {
   }, [resetState, videoURL]);
 
   // --- Download all frames/gradcam of a sequence in ZIP ---
-  function base64ToBlob(base64, contentType = 'image/jpeg') {
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type: contentType });
+  async function fetchImageAsBlob(path) {
+    // path is like "/analyzed_frames/uuid/sequence_0/frame_0.jpg"
+    // API_URL might end without a slash, so avoid double slashes
+    const url = path.startsWith('/') ? `${API_URL}${path}` : `${API_URL}/${path}`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('Не вдалося завантажити зображення');
+    return await resp.blob();
   }
 
   function addExplanationToZip(zip, explanationText) {
@@ -216,7 +213,7 @@ export default function VideoUpload() {
       const zip = new JSZip();
       for (let i = 0; i < framesArray.length; ++i) {
         const { frame_number, image } = framesArray[i];
-        const blob = base64ToBlob(image);
+        const blob = await fetchImageAsBlob(image);
         zip.file(`frame_${frame_number}.jpg`, blob);
       }
       const content = await zip.generateAsync({ type: 'blob' });
@@ -247,7 +244,7 @@ export default function VideoUpload() {
       const zip = new JSZip();
       for (let i = 0; i < gradcamArray.length; ++i) {
         const { frame_number, image } = gradcamArray[i];
-        const blob = base64ToBlob(image);
+        const blob = await fetchImageAsBlob(image);
         zip.file(`gradcam_${frame_number}.jpg`, blob);
       }
       addExplanationToZip(zip, seq.explanation);
@@ -470,7 +467,7 @@ export default function VideoUpload() {
                       {seq.frames?.map(({ frame_number, image }) => (
                         <div key={frame_number} className="frame-card">
                           <img
-                            src={`data:image/jpeg;base64,${image}`}
+                            src={`${API_URL}${image}`}
                             alt={`Кадр ${frame_number}`}
                             className="frame-image"
                           />
@@ -486,7 +483,7 @@ export default function VideoUpload() {
                       {seq.gradcam?.map(({ frame_number, image }) => (
                         <div key={frame_number} className="frame-card">
                           <img
-                            src={`data:image/jpeg;base64,${image}`}
+                            src={`${API_URL}${image}`}
                             alt={`Grad-CAM ${frame_number}`}
                             className="frame-image"
                           />

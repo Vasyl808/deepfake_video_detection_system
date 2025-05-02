@@ -9,8 +9,14 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - ./backend/analyzed_frames:/app/analyzed_frames
     environment:
       - PYTHONUNBUFFERED=1
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      redis:
+        condition: service_healthy
 
   frontend:
     build: 
@@ -20,3 +26,25 @@ services:
       - "3000:80"
     volumes:
       - ./frontend:/app
+
+  redis:
+    image: redis:7.4.3-alpine
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./backend/redis-data
+      o: bind

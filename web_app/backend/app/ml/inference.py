@@ -15,8 +15,7 @@ class VideoInference:
             lstm_hidden_dim=model_config.lstm_hidden_dim,
             num_lstm_layers=model_config.num_lstm_layers,
             dropout=model_config.dropout,
-            bidirectional=model_config.bidirectional,
-            freeze=model_config.freeze
+            bidirectional=model_config.bidirectional
         )
 
         checkpoint = torch.load(model_path, map_location=self.device)
