@@ -12,7 +12,6 @@ from app.core.config import model_config, app_config
 import os
 import uuid
 
-
 class VideoAnalyzer:
     def __init__(self, model_path: str, device: str = 'cpu'):
         self.device = device
@@ -29,13 +28,14 @@ class VideoAnalyzer:
 
         output = self.inference.predict(frames)
         score = output.cpu().numpy().tolist()[0]
+        is_fake = bool(torch.sigmoid(torch.tensor(score[0])).round())
 
         target_module = self.inference.model.feature_extractor[0]
         target_layer = find_last_conv_layer(target_module)
         gradcam = GradCAM(self.inference.model, target_layer, input_size=(224, 224))
 
         frames.requires_grad = True
-        grad_cam_maps = gradcam.generate(frames)
+        grad_cam_maps = gradcam.generate(frames, is_fake)
         num_frames = grad_cam_maps.shape[0]
 
         video_tensor_cpu = frames.cpu().squeeze(0)
@@ -64,7 +64,6 @@ class VideoAnalyzer:
                 image=f"/analyzed_frames/{os.path.basename(output_dir)}/sequence_{sequence_idx}/{gradcam_filename}"
             ))
 
-        is_fake = bool(torch.sigmoid(torch.tensor(score[0])).round())
         explanation = (
             "Послідовність визначено як фейк."
             if is_fake
