@@ -1,7 +1,7 @@
 from typing import Dict, Union, Any
 
 
-def get_model_parms(name: str) -> Union[int, float, bool]:
+def get_model_parms(name: str) -> Union[int, float, bool, None]:
     hyperparameters = {
         "hyperparameters_resnet_lstm": {
             'lstm_hidden_dim': 32,
