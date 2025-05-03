@@ -12,6 +12,7 @@ from app.core.config import model_config, app_config
 import os
 import uuid
 
+
 class VideoAnalyzer:
     def __init__(self, model_path: str, device: str = 'cpu'):
         self.device = device
