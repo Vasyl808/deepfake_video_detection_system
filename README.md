@@ -87,7 +87,7 @@ python test.py --data_path ./data --model_path ./models/model.pth
 - `train.py`: Script for training models.
 - `test.py`: Script for testing models.
 - `data/`: Directory for storing datasets.
-- `models/`: Directory for saving trained models.
+- `models/`: Directory for models.
 - `requirements.txt`: File with Python dependencies.
 
 ## Notes
