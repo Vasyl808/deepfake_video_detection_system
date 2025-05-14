@@ -32,7 +32,7 @@ The Deepfake Video Detection System is designed to analyze video content and det
    docker-compose up --build
    ```
 
-3. Access the web application in your browser at `http://localhost:8000` (default port, adjust if configured differently in `.env` files).
+3. Access the web application in your browser at `http://localhost:3000` (default port, adjust if configured differently in `.env` files).
 
 ## How to Train and Test Models
 
