@@ -18,6 +18,12 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
+ENV PYTHONPATH=/app
+ENV REDIS_URL=redis://redis:6379/0
+
+RUN mkdir -p /app/temp && chmod 777 /app/temp
+RUN mkdir -p /app/analyzed_frames && chmod 777 /app/analyzed_frames
+
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,77 +1,48 @@
 import cv2
 import numpy as np
+import base64
 import torch
+import cv2
 import torchvision
 import torch.nn as nn
 import torch.optim as optim
 from torch.nn import functional as F
 from facenet_pytorch import MTCNN
 from torchvision import transforms
+from torchvision.transforms.functional import to_pil_image
 
 
-class SameAugmentation:
-    def __init__(self, augmentations):
-        self.augmentations = augmentations
-
-    def __call__(self, frames):
-        seed = torch.randint(0, 2**32, (1,)).item()
-
-        augmented_frames = []
-        for frame in frames:
-            torch.manual_seed(seed)
-            augmented_frames.append(self.augmentations(frame))
-        
-        return torch.stack(augmented_frames)
+def tensor_to_b64(frame_tensor):
+    frame_np = frame_tensor.permute(1, 2, 0).detach().numpy()
+    frame_np = (frame_np - frame_np.min()) / (frame_np.max() - frame_np.min() + 1e-8)
+    frame_np = np.uint8(frame_np * 255)
+    frame_np_bgr = cv2.cvtColor(frame_np, cv2.COLOR_RGB2BGR)
+    _, buffer = cv2.imencode('.jpg', frame_np_bgr)
+    return base64.b64encode(buffer).decode("utf-8")
 
 
-class GradCAM:
-    def __init__(self, model, target_layer, input_size=(224, 224)):
-        self.model = model
-        self.model.eval()
-        self.target_layer = target_layer
-        self.input_size = input_size
-        self.activations = None
-        self.gradients = None
+def overlay_heatmap(tensor, gradcam_map, out_path):
+    frame_np = tensor.permute(1, 2, 0).detach().cpu().numpy()
+    frame_np = (frame_np - frame_np.min()) / (frame_np.max() - frame_np.min() + 1e-8)
+    frame_np = np.uint8(255 * frame_np)
 
-        self.target_layer.register_forward_hook(self.forward_hook)
-        self.target_layer.register_backward_hook(self.backward_hook)
+    heatmap = np.uint8(255 * gradcam_map)
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+    heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
 
-    def forward_hook(self, module, input, output):
-        self.activations = output.detach()
-
-    def backward_hook(self, module, grad_input, grad_output):
-        self.gradients = grad_output[0].detach()
-
-    def generate(self, input_tensor, target_logit=None):
-
-        output = self.model(input_tensor)  # (1, 1)
-        self.model.zero_grad()
-
-        output.backward(retain_graph=True)
-
-        weights = self.gradients.mean(dim=(2, 3), keepdim=True)  # (num_frames, C, 1, 1)
-
-        grad_cam_map = F.relu((weights * self.activations).sum(dim=1, keepdim=True))  # (num_frames, 1, H_feat, W_feat)
-
-        grad_cam_map = F.interpolate(grad_cam_map, size=self.input_size, mode='bilinear', align_corners=False)
-        grad_cam_map = grad_cam_map.squeeze(1)
-
-        grad_cam_maps = []
-        for i in range(grad_cam_map.size(0)):
-            cam = grad_cam_map[i]
-            cam_min = cam.min()
-            cam_max = cam.max()
-            cam_norm = (cam - cam_min) / (cam_max - cam_min + 1e-8)
-            grad_cam_maps.append(cam_norm.cpu().numpy())
-        return np.stack(grad_cam_maps, axis=0)
+    overlay = cv2.addWeighted(frame_np, 0.5, heatmap, 0.5, 0)
+    overlay = cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR)
+    
+    cv2.imwrite(out_path, overlay)
 
 
-def find_last_conv_layer(module):
-    last_conv = None
-    for name, layer in module.named_modules():
-        if isinstance(layer, nn.Conv2d):
-            last_conv = layer
-    return last_conv
+def tensor_to_imagefile(tensor, out_path):
+    frame_np = tensor.permute(1, 2, 0).detach().cpu().numpy()
+    frame_np = (frame_np - frame_np.min()) / (frame_np.max() - frame_np.min() + 1e-8)
+    frame_np = np.uint8(255 * frame_np)
+    frame_np = cv2.cvtColor(frame_np, cv2.COLOR_RGB2BGR)
+    
+    cv2.imwrite(out_path, frame_np)
 
 
 def process_frame(frame):
@@ -187,3 +158,4 @@ def extract_frames(video_path, start_time, end_time, num_frames=20, margin=20):
             seq["faces"].extend([seq["faces"][-1]] * (num_frames - len(seq["faces"])))
 
     return [seq["faces"] for seq in face_sequences.values()]
+    
