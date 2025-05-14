@@ -56,7 +56,7 @@ python train.py --data_path <path_to_dataset> --model_path <path_to_save_model> 
 
 Example:
 ```bash
-python train.py --data_path ./data/train --model_path ./models/model.pth --epochs 20 --batch_size 32
+python train.py --data_path ./data --model_path ./models/model.pth --epochs 20 --batch_size 32
 ```
 
 ### Testing a Model:
@@ -69,7 +69,7 @@ python test.py --data_path <path_to_test_data> --model_path <path_to_trained_mod
 
 Example:
 ```bash
-python test.py --data_path ./data/test --model_path ./models/model.pth
+python test.py --data_path ./data --model_path ./models/model.pth
 ```
 
 ### Common Arguments:
