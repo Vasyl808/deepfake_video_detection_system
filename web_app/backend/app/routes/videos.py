@@ -8,7 +8,6 @@ from app.schemas.video_url import VideoURL
 from app.core.config import app_config
 from app.utils.file_manager import file_manager
 from app.utils.file_utils import is_youtube_url
-from app.utils.video_downloaders import VideoDownloaderFactory
 
 import os
 import uuid
@@ -47,12 +46,10 @@ async def download_from_url(
     background_tasks: BackgroundTasks,
 ):
     url = video_data.url.strip()
-    
-    downloader = VideoDownloaderFactory.get_downloader(url)
-    if not downloader:
+    if not is_youtube_url(url):
         raise HTTPException(
             status_code=400,
-            detail="URL не розпізнано. Підтримуються лише YouTube, TikTok, Facebook та Instagram відео."
+            detail="URL не розпізнано. Дозволено лише YouTube відео."
         )
     
     unique_id = uuid.uuid4()
@@ -60,7 +57,12 @@ async def download_from_url(
     os.makedirs(temp_dir, exist_ok=True)
     
     try:
-        temp_path, suggested_filename = await downloader.download(url, temp_dir)
+        yt = YouTube(url, on_progress_callback=on_progress)
+        stream = yt.streams.get_highest_resolution()
+        filename = f"{yt.title}-{yt.video_id}.mp4"
+        temp_path = os.path.join(temp_dir, filename)
+        
+        stream.download(output_path=temp_dir, filename=filename)
         
         if os.path.getsize(temp_path) > app_config.MAX_FILE_SIZE:
             os.remove(temp_path)
@@ -69,11 +71,11 @@ async def download_from_url(
                 detail="Відео занадто велике. Максимальний розмір: 500MB"
             )
         
-        final_filename = f"{str(unique_id)}_{suggested_filename}"
+        final_filename = f"youtube_{unique_id}_{os.path.basename(temp_path)}"
         permanent_path = os.path.join(app_config.TEMP_DIR, final_filename)
         
         shutil.move(temp_path, permanent_path)
-
+        
         await file_manager.register_file(final_filename, status="done")
         
         background_tasks.add_task(file_manager.clean_old_files)
@@ -87,3 +89,4 @@ async def download_from_url(
     finally:
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
+            
