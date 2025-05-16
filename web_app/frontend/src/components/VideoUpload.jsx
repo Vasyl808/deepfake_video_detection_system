@@ -33,6 +33,13 @@ export default function VideoUpload() {
     if (videoRef.current) videoRef.current.load();
   }, [videoURL]);
 
+  // Ефект для прокрутки відео при зміні startTime
+  useEffect(() => {
+    if (videoRef.current && videoURL) {
+      videoRef.current.currentTime = startTime;
+    }
+  }, [startTime, videoURL]);
+
   const resetState = useCallback(() => {
     setDuration(0);
     setStartTime(0);
@@ -87,6 +94,7 @@ export default function VideoUpload() {
     const val = clamp(Number(e.target.value), 0, duration - 10);
     setStartTime(val);
     setManualTime(String(val));
+    // VideoRef.current.currentTime вже встановлюється в useEffect
   }, [duration]);
 
   const handleManualChange = useCallback((e) => {
@@ -95,6 +103,7 @@ export default function VideoUpload() {
     const num = Number(val);
     if (!isNaN(num) && num >= 0 && num <= duration - 10) {
       setStartTime(Math.floor(num));
+      // VideoRef.current.currentTime вже встановлюється в useEffect
     }
   }, [duration]);
 
