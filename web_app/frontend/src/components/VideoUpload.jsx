@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import JSZip from 'jszip';
 import '../styles/VideoUpload.css';
 
-const API_URL = 'https://8000-vasyl808-deepfakevideod-vxui3rgqzba.ws-eu118.gitpod.io';
+const API_URL = process.env.REACT_APP_API_URL;
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 
 export default function VideoUpload() {
