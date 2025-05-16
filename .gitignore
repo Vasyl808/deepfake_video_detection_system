@@ -21,4 +21,5 @@ web_app/backend/best_ResNetLSTMNoBiClassifier20x224_lstm_checkpoint_epoch_step_2
 web_app/frontend/node_modules/
 web_app/backend/app/ml/weights/best_ResNetLSTMNoBiClassifier20x224_lstm_checkpoint_epoch_step_23.pt
 web_app/backend/.env
+web_app/frontend/.env
 web_app/.env
