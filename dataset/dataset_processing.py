@@ -70,7 +70,7 @@ def count_labels_from_json(json_file: str) -> Dict[str, int]:
     return dict(label_counts)
 
 
-def get_data_path(base_path: str) -> Tuple[str]:
+def get_data_path(base_path: str) -> Tuple[str, str]:
     metadata_csv = base_path + 'faces_metadata.csv'
     df = pd.read_csv(metadata_csv)
 
